@@ -27,7 +27,7 @@
     scroll-padding-top: 3rem;
 }
 :root{
-    --bg-color: rgb(244, 217, 208);
+    --bg-color: rgb(255, 255, 255);
     --primary-color: rgb(146, 26, 64);
     --nav-hover-color: rgb(217, 171, 171);
     --footer-color: rgb(23, 107, 135);
@@ -164,6 +164,7 @@ header{
     background: transparent;
     padding: 30px 14%;
     transition: all .50s ease;
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 header.sticky{
@@ -1067,32 +1068,14 @@ a.facebook .facebook-icon{
 }
 
 /* -------------------------------------------------Menu------------------------------------------- */
+
 .shop {
     padding: 50px 0;
     background-color: var(--bg-color);
     text-align: center;
+    z-index: 1;
 }
 
-.middle-text {
-    padding-top: 4rem;
-    text-align: center;
-}
-
-.middle-text h4 {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 5px;
-    color: var(--primary-color);
-}
-
-.middle-text h2 {
-    margin-top: 10px;
-    margin-bottom: 30px;
-    font-size: var(--h2-font);
-    color: var(--text-color);
-    font-family: 'Nautilus';
-    font-weight: bold;
-}
 
 .shop-content {
     gap: 2rem;
@@ -1947,7 +1930,114 @@ hr {
     margin-bottom: 0;
     font-style: italic;
 }
-/*-------------------------------------- Responsive styles---------------------------- */
+
+/* Top Image Style */
+.top-image {
+    max-height: 40vh;
+    width: 100%;
+    position: relative;
+    background-position: center;
+    text-align: center;
+    color: var(--white-color);
+    background-size: cover;
+    overflow: hidden;
+}
+
+
+.top-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 1;
+}
+
+.middle-text {
+    padding-top: 4rem;
+    text-align: center;
+}
+
+.middle-text h4 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: white;
+}
+
+.middle-text h2 {
+    margin-top: 10px;
+    margin-bottom: 30px;
+    font-size: var(--h2-font);
+    color: white;
+    font-family: 'Nautilus';
+    font-weight: bold;
+}
+
+
+/* Breadcrumb */
+.row1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 15%;
+}
+
+.search-icon {
+    margin-top: 0; 
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.breadcrumb {
+    margin: 15px 0;
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    font-family: "Poppins", sans-serif;
+}
+
+.breadcrumb > li {
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
+}
+
+.breadcrumb > li a {
+    font-size: 14px;
+    text-transform: capitalize;
+    color: #ff8c00; /* Orange color for the links */
+    text-decoration: none;
+    padding: 8px 12px;
+    transition: color 0.3s ease;
+    margin: 0 5px;
+}
+
+.breadcrumb > li a:hover {
+    text-decoration: underline; /* Underline on hover */
+}
+
+.breadcrumb > li:before {
+    content: ">";
+    color: #ff8c00; /* Orange color for the arrow */
+    padding: 0 10px;
+}
+
+.breadcrumb > li:first-child:before {
+    content: ""; /* No arrow before the first item */
+}
+
+.breadcrumb > li:last-child a {
+    color: #000; /* Black color for the active item */
+    font-weight: bold;
+}
+
+.breadcrumb > li:last-child:before {
+    color: #000; /* Black arrow before the active item */
+}
+  /*-------------------------------------- Responsive styles---------------------------- */
 @media (max-width: 1545px){
     header{
         padding: 22px 4%;
