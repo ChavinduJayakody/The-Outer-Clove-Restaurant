@@ -25,6 +25,7 @@ if ($result) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
     $item_name = mysqli_real_escape_string($conn, $_POST['item_name']);
     $price = mysqli_real_escape_string($conn, $_POST['price']);
+    $cuisine_id = mysqli_real_escape_string($conn, $_POST['cuisine_id']);
 
     $target_dir = "../uploads/";
     $relativePath = "uploads/" . basename($_FILES["product_image"]["name"]);
@@ -43,8 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
         if (move_uploaded_file($_FILES["product_image"]["tmp_name"], $target_file)) {
             echo "The file " . htmlspecialchars(basename($_FILES["product_image"]["name"])) . " has been uploaded.";
 
-            $insertQuery = "INSERT INTO menu (item_image_path, item_name, price)
-                            VALUES ('$relativePath', '$item_name', '$price')";
+            $insertQuery = "INSERT INTO menu (item_image_path, item_name, price,cuisine_id)
+                            VALUES ('$relativePath', '$item_name', '$price', '$cuisine_id')";
 
             if ($conn->query($insertQuery) === TRUE) {
                 header('Location: menuManagement.php');
@@ -78,8 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_product'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signature Cuisine - Menu Management</title>
-    <link rel="stylesheet" href="../admin.css">
+    <title>Outer Clove | Menu Management</title>
+    <link rel="stylesheet" href="admin.css">
 </head>
 
 <body>
@@ -103,6 +104,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_product'])) {
     </section>
     <section>
         <h2>Menu Management</h2>
+
+        <h3>Cuisines</h3>
+        <form method="POST" action="../components/add-cuisine.php">
+            <label for="cuisine_name">Add New Cuisine:</label>
+            <input type="text" id="cuisine_name" name="cuisine_name" required>
+            <button type="submit">Add Cuisine</button>
+        </form>
+
+        <h3>Add New Product</h3>
         <form method="post" enctype="multipart/form-data" style="margin-top: 20px; text-align:center;">
             <label for="addproduct_image">Product Image:</label>
             <input type="file" id="addproduct_image" name="product_image" accept="image/*" required>
@@ -110,9 +120,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_product'])) {
             <input type="text" name="item_name" required>
             <label for="price">Price:</label>
             <input type="text" name="price" required>
+            <label for="cuisine">Cuisine:</label>
+                <select name="cuisine_id" id="cuisine">
+                    <?php
+                    $cuisines_result = $conn->query("SELECT id, name FROM cuisines");
+                    while ($cuisine = $cuisines_result->fetch_assoc()) {
+                        echo "<option value='{$cuisine['id']}'>" . htmlspecialchars($cuisine['name']) . "</option>";
+                    }
+                    ?>
+                </select>
             <button type="submit" name="add_product">Add Product</button>
         </form>
         <div id="menu-list" class="menu-grid">
+            <h3>Menu Items</h3>
             <?php
             if (isset($menuItems)) {
                 foreach ($menuItems as $menuItem) {

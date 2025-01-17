@@ -1067,37 +1067,77 @@ a.facebook .facebook-icon{
     color: var(--other-color);
 }
 
-/* -------------------------------------------------Menu------------------------------------------- */
+/* ------------------------------------------------- Menu Section ------------------------------------------- */
 
 .shop {
+    
     padding: 50px 0;
     background-color: var(--bg-color);
     text-align: center;
     z-index: 1;
 }
 
-
 .shop-content {
-    gap: 2rem;
+    gap: 3rem;
     justify-content: center;
-    margin-top: 4rem;
+    margin-top: 1rem;
     padding: 30px 5% 70px;
+    margin-left: 50px;
+    margin-right: 50px;
+    
+}
+
+.cuisine-section {
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 40px;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
+    padding: 30px 5% 70px;
     margin-left: 50px;
     margin-right: 50px;
 }
 
+.shop-content h2 {
+    font-size: 36px;
+    font-weight: bold;
+    color: var(--highlight-color);
+    font-family: Nautilus;
+    text-transform: capitalize;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    margin-top: 1rem;
+    position: relative;
+}
+
+.shop-content h2::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 3px;
+    background-color: var(--primary-color);
+    bottom: 0;
+    left: 0;
+    transform: scaleX(1);
+    transform-origin: bottom center;
+    transition: transform 0.3s ease;
+    align-items: center;
+}
+
 .row {
     position: relative;
-    /* width: 300px; */
     margin: 0 15px 30px;
     padding: 20px;
-    margin-top: 50px;
     background-color: var(--primary-color);
     border-radius: 8px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
     text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.row:hover {
+    transform: translateY(-10px);
 }
 
 .row img {
@@ -1107,7 +1147,10 @@ a.facebook .facebook-icon{
     border-radius: 8px;
     transition: transform 0.5s ease;
     cursor: pointer;
-    aspect-ratio: 1/1;
+}
+
+.row img:hover {
+    transform: scale(1.05);
 }
 
 .row h3 {
@@ -1116,12 +1159,7 @@ a.facebook .facebook-icon{
     font-size: 24px;
     margin-bottom: 5px;
     font-weight: 700;
-}
-
-.row p {
-    color: var(--nav-hover-color);
-    font-size: var(--p-font);
-    line-height: 30px;
+    text-transform: capitalize;
 }
 
 .in-text {
@@ -1132,7 +1170,7 @@ a.facebook .facebook-icon{
 }
 
 .in-text .price h6 {
-    font-size: 17px;
+    font-size: 18px;
     color: white;
     font-weight: 600;
 }
@@ -1159,13 +1197,28 @@ a.facebook .facebook-icon{
     transition: ease-in-out .5s;
 }
 
+.top-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.top-icon a {
+    color: var(--highlight-color);
+    font-size: 18px;
+}
+
+.top-icon a:hover {
+    color: var(--other-color);
+}
+
 .row-btn {
     text-align: center;
     margin-top: 1rem;
     margin-right: 1%;
 }
-.row-btn2{
 
+.row-btn2 {
     color: var(--primary-color);
     text-align: center;
     margin-top: 1rem;
@@ -1174,13 +1227,11 @@ a.facebook .facebook-icon{
     height: 10%;
     margin-left: 40%;
 }
-.row-btn2 a{
+
+.row-btn2 a {
     background-color: var(--primary-color);
 }
-.row img:hover {
-    transform: scale(1.1);
-    color: red;
-}
+
 .row-btn a {
     display: inline-block;
     background-color: var(--primary-color);
@@ -1199,9 +1250,36 @@ a.facebook .facebook-icon{
     color: white;
     box-shadow: var(--ff9f0d) 0px 1px 8px;
     transform: scale(1.01);
-    transition: ease-in-out .5s ;
+    transition: ease-in-out .5s;
     border-radius: 10px;
     border: none;
+}
+
+.cuisine-section .row {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: var(--primary-color);
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease;
+
+}
+
+.cuisine-section .row h3 {
+    font-size: 22px;
+}
+
+@media (max-width: 1024px) {
+    .shop-content {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .shop-content {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* ------------------------------------------ Cart-----------------------------------------------------------  */
@@ -1805,7 +1883,7 @@ hr {
     border-radius: 2rem;
 }
 /* ------------------------------------------------------Search --------------------------------------------------------*/
-.search-popup {
+/* .search-popup {
     display: none;
     position: fixed;
     top: 0;
@@ -1835,7 +1913,7 @@ hr {
     background-color: #ffffff;
     border: none;
     cursor: pointer;
-}
+} */
  
 .hide{
     visibility: hidden;
@@ -1974,6 +2052,47 @@ hr {
     font-weight: bold;
 }
 
+/* search bar */
+
+.search-bar {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 15px 0;
+    padding: 10px 20px;
+}
+
+.search-bar input[type="text"] {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 200px;
+    transition: width 0.3s ease;
+    padding-right: 30px;
+}
+
+.search-bar input[type="text"]:focus {
+    width: 300px;
+}
+
+.search-bar .close-icon {
+    position: absolute;
+    right: 15px;
+    font-size: 18px;
+    color: #999;
+    cursor: pointer;
+    display: none;
+}
+.search-bar input[type="text"]:focus + .close-icon {
+    display: block;
+}
+
+.search-bar input[type="text"]:not(:placeholder-shown) + .search-icon {
+    display: block;
+}
+
 
 /* Breadcrumb */
 .row1 {
@@ -1983,12 +2102,6 @@ hr {
     padding: 0 15%;
 }
 
-.search-icon {
-    margin-top: 0; 
-    border: none;
-    background: none;
-    cursor: pointer;
-}
 
 .breadcrumb {
     margin: 15px 0;

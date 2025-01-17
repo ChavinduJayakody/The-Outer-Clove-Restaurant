@@ -9,15 +9,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $item_image_path = htmlspecialchars($_POST["item_image_path"]);
     $item_name = htmlspecialchars($_POST["item_name"]);
     $price = floatval($_POST["price"]);
+    $cuisine_id = intval($_POST["cuisine_id"]);
 
-    $stmt = $conn->prepare("INSERT INTO menu (item_image_path, item_name, price) VALUES (?, ?, ?)");
-    $stmt->bind_param("ssd", $item_image_path, $item_name, $price);
+    $stmt = $conn->prepare("INSERT INTO menu (item_image_path, item_name, price, cuisine_id) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssdi", $item_image_path, $item_name, $price, $cuisine_id);
     $stmt->execute();
     $stmt->close();
 }
 
-$result = $conn->query("SELECT * FROM menu");
-$conn->close();
+$cuisines_query = $conn->query("SELECT m.*, c.name AS cuisine_name 
+                        FROM menu m 
+                        JOIN cuisines c ON m.cuisine_id = c.id 
+                        ORDER BY c.name, m.item_name");
+
+if(!$cuisines_query) {
+    echo 'Database query failed: ' . $conn->error;
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -69,37 +77,46 @@ $conn->close();
             window.location.href = 'checkout.php';
         }
 
-        function toggleSearchPopup() {
-            var searchPopup = document.getElementById('search-popup');
-            searchPopup.style.display = searchPopup.style.display === 'block' ? 'none' : 'block';
-        }
+// Search for menu items
+function searchMenuItems() {
+    var searchText = document.getElementById('searchInput').value.toLowerCase();
+    var menuItems = document.getElementsByClassName('row');
 
-        function searchMenuItems() {
-            var searchText = document.getElementById('searchInput').value.toLowerCase();
-            var menuItems = document.getElementsByClassName('row');
+    // Filter menu items based on search input
+    Array.from(menuItems).forEach(function(item) {
+        var itemName = item.getElementsByTagName('h3')[0].innerText.toLowerCase();
+        item.style.display = itemName.includes(searchText) ? 'block' : 'none';
+    });
 
-            Array.from(menuItems).forEach(function(item) {
-                var itemName = item.getElementsByTagName('h3')[0].innerText.toLowerCase();
-                item.style.display = itemName.includes(searchText) ? 'block' : 'none';
-            });
-        }
+    // Show or hide the close icon based on the input length
+    var closeIcon = document.getElementById('closeIcon');
+    closeIcon.style.display = searchText.length > 0 ? 'block' : 'none';
+}
 
-        function closeSearchPopup() {
-            document.getElementById('search-popup').style.display = 'none';
-        }
+// Clear the search input
+function clearSearch() {
+    var searchInput = document.getElementById('searchInput');
+    searchInput.value = '';
+    input.focus();
+    // document.getElementById('closeIcon').style.display = 'none';
 
-        document.getElementById('searchInput').addEventListener('input', searchMenuItems);
-    </script>
+    // Reset the display of all menu items
+    var menuItems = document.getElementsByClassName('row');
+    Array.from(menuItems).forEach(function(item) {
+        item.style.display = 'block';
+    });
+}
+  </script>
 </head>
 
 <body>
-    <!-- Search Popup -->
+    <!-- Search Popup
     <div id="search-popup" class="search-popup">
         <div class="search-content">
             <input type="text" id="searchInput" placeholder="Search...">
             <button onclick="closeSearchPopup()">X</button>
         </div>
-    </div>
+    </div> -->
 
     <!-- Header -->
     <?php include 'components/header.php'; ?>
@@ -119,34 +136,59 @@ $conn->close();
             <li><a href="../index.php" title="The Outer Clove" class="bolds">Home</a></li>
             <li><a href="#">Menu</a></li>
         </ol>
-        <div class="search-icon">
-            <button onclick="toggleSearchPopup()"><i class="bx bx-search"></i></button>
-        </div>
+        <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search...">
+    <i class="bx bx-x close-icon" id="closeIcon" onclick="clearSearch()"></i>
+</div>
     </div>
 
     <!-- Menu Section -->
     <section class="shop" id="shop">
-        <div class="shop-content">
-            <?php while ($row = $result->fetch_assoc()): ?>
-                <div class="row">
-                    <img src="<?= $row['item_image_path'] ?>" alt="<?= $row['item_name'] ?>">
-                    <h3><?= $row['item_name'] ?></h3>
-                    <div class="in-text">
-                        <div class="price">
-                            <h6>Rs.<?= number_format($row['price'], 2) ?></h6>
-                        </div>
-                        <div class="order-btn">
-                            <a href="#" onclick="openCartPopup('<?= $row['item_name'] ?>', '<?= number_format($row['price'], 2) ?>')">Order Now</a>
-                        </div>
+    <div class="shop-content">
+        <?php
+        // Fetch meals grouped by cuisine
+        $current_cuisine = null;
+        $has_products = true;
+        if (!$has_products) {
+            echo "<p>No products found.</p>";
+        }
+
+        while ($row = $cuisines_query->fetch_assoc()) {
+            if ($current_cuisine !== $row['cuisine_name']) {
+                if ($current_cuisine !== null) {
+                    // Close the previous cuisine section
+                    echo "</div>";
+                }
+                // Start a new cuisine section
+                $current_cuisine = $row['cuisine_name'];
+                echo "<h2>" . htmlspecialchars($current_cuisine) . "</h2><div class='cuisine-section'>";
+            }
+            ?>
+            <div class="row">
+                <img src="<?= htmlspecialchars($row['item_image_path']) ?>" alt="<?= htmlspecialchars($row['item_name']) ?>">
+                <h3><?= htmlspecialchars($row['item_name']) ?></h3>
+                <div class="in-text">
+                    <div class="price">
+                        <h6>Rs.<?= number_format($row['price'], 2) ?></h6>
                     </div>
-                    <div class="top-icon">
-                        <a href="#"><i class="bx bx-heart"></i></a>
+                    <div class="order-btn">
+                        <a href="#" onclick="openCartPopup('<?= htmlspecialchars($row['item_name']) ?>', '<?= number_format($row['price'], 2) ?>')">Order Now</a>
                     </div>
                 </div>
-            <?php endwhile; ?>
-        </div>
-    </section>
-
+                <div class="top-icon">
+                    <a href="#"><i class="bx bx-heart"></i></a>
+                </div>
+            </div>
+            <?php
+        }
+        if ($current_cuisine !== null) {
+            // Close the last cuisine section
+            echo "</div>";
+        }
+        $conn->close();
+        ?>
+    </div>
+</section>
     <!-- Cart Component -->
     <?php include 'components/cart.php'; ?>
 
