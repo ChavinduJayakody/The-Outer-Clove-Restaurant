@@ -37,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
     $item_name = mysqli_real_escape_string($conn, $_POST['item_name']);
     $price = mysqli_real_escape_string($conn, $_POST['price']);
     $cuisine_id = mysqli_real_escape_string($conn, $_POST['cuisine_id']);
+    $description = mysqli_real_escape_string($conn, $_POST['description']);
 
     $target_dir = "../uploads/";
     $relativePath = "uploads/" . basename($_FILES["product_image"]["name"]);
@@ -56,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
             echo "The file " . htmlspecialchars(basename($_FILES["product_image"]["name"])) . " has been uploaded.";
 
             $insertQuery = "INSERT INTO menu (item_image_path, item_name, price, cuisine_id)
-                            VALUES ('$relativePath', '$item_name', '$price', '$cuisine_id')";
+                            VALUES ('$relativePath', '$item_name', '$price', '$cuisine_id', '$description')";
 
             if ($conn->query($insertQuery) === TRUE) {
                 header('Location: menuManagement.php');
@@ -69,7 +70,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
         }
     }
 }
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_product'])) {
     $id_to_remove = mysqli_real_escape_string($conn, $_POST['remove_product']);
 
@@ -150,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_cuisine'])) {
             </form>
 
             <h3>Existing cuisines :</h3>
-            <div >
+            <div>
                 <ul>
                     <?php
                     foreach ($cuisines as $cuisine) {
@@ -168,48 +168,127 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_cuisine'])) {
             </div>
         </div>
         <!-- Menu Section -->
-        <h2>Cuisine Management</h2>
-        <div class="container">
-            <h3>Menu</h3>
-            <form method="post" enctype="multipart/form-data">
-                <label for="addproduct_image">Product Image:</label>
-                <input type="file" id="addproduct_image" name="product_image" accept="image/*" required>
-                <label for="item_name">Product Name:</label>
-                <input type="text" name="item_name" required>
-                <label for="price">Price:</label>
-                <input type="text" name="price" required>
-                <label for="cuisine">Cuisine:</label>
-                <select name="cuisine_id" id="cuisine">
-                    <?php
-                    foreach ($cuisines as $cuisine) {
-                        echo "<option value='{$cuisine['id']}'>" . htmlspecialchars($cuisine['name']) . "</option>";
-                    }
-                    ?>
-                </select>
-                <button type="submit" name="add_product"><i class="fas fa-plus"></i> Add Product</button>
-            </form>
-
-            <div id="menu-list">
-                <h3>Menu Items</h3>
-                <ul>
-                    <?php
-                    foreach ($menuItems as $menuItem) {
-                        echo "<li>";
-                        echo "<div class='menu-card'>";
-                        echo "<img src='../{$menuItem['item_image_path']}' alt='{$menuItem['item_name']}'>";
-                        echo "<div class='menu-card-content'>";
-                        echo "<h4>{$menuItem['item_name']}</h4>";
-                        echo "<p>Price: {$menuItem['price']}</p>";
-                        echo "<form method='post'><input type='hidden' name='remove_product' value='{$menuItem['id']}'><button type='submit'><i class='fas fa-trash'></i> Remove</button></form>";
-                        echo "</div>";
-                        echo "</div>";
-                        echo "</li>";
-                    }
-                    ?>
-                </ul>
+        <h2>Menu Management</h2>
+        <div class="container menu-container">
+            <div>
+                <h3>Menu :</h3>
             </div>
+            <div class="form-container">
+                <form method="post" enctype="multipart/form-data" class="form-left">
+                    <label for="item_name">Product Name:</label>
+                    <input type="text" name="item_name" required>
+
+                    <label for="price">Price:</label>
+                    <input type="text" name="price" required>
+
+                    <label for="cuisine">Cuisine:</label>
+                    <select name="cuisine_id" id="cuisine">
+                        <?php
+                        foreach ($cuisines as $cuisine) {
+                            echo "<option value='{$cuisine['id']}'>" . htmlspecialchars($cuisine['name']) . "</option>";
+                        }
+                        ?>
+                    </select>
+                    <label for="description">Description:</label>
+                    <input type="text" name="description" placeholder="Description" required>
+
+                    <button type="submit" name="add_product"><i class="fas fa-plus"></i> Add Product</button>
+                </form>
+
+                <div class="image-upload-container">
+                    <label for="addproduct_image" class="image-upload-box">
+                        <div class="placeholder">
+                            <i class="fas fa-plus"></i>
+                            <p class="upload-hint">Only image formats (JPG, PNG, GIF) are allowed</p>
+                        </div>
+                        <img id="imagePreview" src="#" alt="Selected Image" style="display: none;" />
+                    </label>
+                    <input type="file" id="addproduct_image" name="product_image" accept="image/*" onchange="previewImage(event)" required hidden>
+                    <div class="image-controls" style="display: none;">
+                        <button type="button" class="change-btn" onclick="changeImage()">Change</button>
+                        <button type="button" class="remove-btn" onclick="removeImage()">Remove</button>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+    <h3>Existing Menu Items:</h3>
+    <ul class="menu-list">
+        <?php
+        foreach ($menuItems as $menuItem) {
+            // Retrieve the cuisine name for each menu item
+            $cuisineName = "";
+            foreach ($cuisines as $cuisine) {
+                if ($cuisine['id'] === $menuItem['cuisine_id']) {
+                    $cuisineName = $cuisine['name'];
+                    break;
+                }
+            }
+            
+            echo "<li class='menu-list-item'>";
+            echo "<img src='../{$menuItem['item_image_path']}' alt='{$menuItem['item_name']}' class='menu-item-image'>";
+            echo "<div class='menu-item-info'>";
+            echo "<h4 class='menu-item-name'>{$menuItem['item_name']}</h4>";
+            echo "<p class='menu-item-cuisine'>Cuisine: {$cuisineName}</p>";
+            echo "<p class='menu-item-description'>Description: {$menuItem['description']}</p>"; 
+            echo "<p class='menu-item-price'>Price: {$menuItem['price']}</p>";
+            echo "</div>";
+            echo "<div class='menu-item-actions'>";
+            echo "<form method='post' class='action-form'>";
+            echo "<input type='hidden' name='remove_product' value='{$menuItem['id']}'>";
+            echo "<button type='submit' class='action-button delete-button'><i class='fas fa-trash'></i> Delete</button>";
+            echo "</form>";
+            echo "<form method='post' class='action-form'>";
+            echo "<input type='hidden' name='update_product' value='{$menuItem['id']}'>";
+            echo "<button type='submit' class='action-button update-button'><i class='fas fa-edit'></i> Update</button>";
+            echo "</form>";
+            echo "</div>";
+            echo "</li>";
+        }
+        ?>
+    </ul>
+</div>
         </div>
     </section>
 </body>
+
+<script>
+    function previewImage(event) {
+        const imagePreview = document.getElementById('imagePreview');
+        const placeholder = document.querySelector('.image-upload-box .placeholder');
+        const controls = document.querySelector('.image-controls');
+
+        // Show the preview
+        const reader = new FileReader();
+        reader.onload = () => {
+            imagePreview.src = reader.result;
+            imagePreview.style.display = 'block';
+            placeholder.style.opacity = '0';
+            controls.style.display = 'flex'; // Show the buttons
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
+
+    function changeImage() {
+        // Trigger the file input click event
+        document.getElementById('addproduct_image').click();
+    }
+
+    function removeImage() {
+        const imagePreview = document.getElementById('imagePreview');
+        const placeholder = document.querySelector('.image-upload-box .placeholder');
+        const controls = document.querySelector('.image-controls');
+        const fileInput = document.getElementById('addproduct_image');
+
+        // Clear the image preview
+        imagePreview.src = '#';
+        imagePreview.style.display = 'none';
+        placeholder.style.opacity = '1';
+        controls.style.display = 'none'; // Hide the buttons
+
+        // Clear the file input value
+        fileInput.value = '';
+    }
+</script>
 
 </html>
