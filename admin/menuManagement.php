@@ -369,6 +369,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_cuisine'])) {
 </body>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="functions/addCuisine.js"></script>
+<script src="functions/addProduct.js"></script>
+<script src="functions/updateCuisine.js"></script>
+<script src="functions/updateProduct.js"></script>
+<script src="functions/deleteCuisine.js"></script>
+<script src="functions/deleteProduct.js"></script>
+
+
+ <!-- Menu update popup -->
+
+<script>
+
+window.cuisinesData = <?php echo json_encode($cuisines); ?>;
+
+</script>
+
+ <!-- product delete popup -->
+
+
 <script>
     function previewImage(event) {
         const imagePreview = document.getElementById('imagePreview');
@@ -402,281 +422,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_cuisine'])) {
         controls.style.display = 'none';
 
         fileInput.value = '';
-    }
-
-    // Popups
-
-    // add product popup
-
-    function addProductPopup(event, item_name, productPrice, productDescription, cuisineId) {
-        event.preventDefault();
-
-        Swal.fire({
-            title: 'Add Product',
-            icon: 'success',
-            text: 'Cuisine Added successfully!',
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true
-        }).then(() => {
-            document.querySelector("form").submit();
-        });
-    }
-
-    // add cuisine popup
-
-    function addCuisinePopup(event, cuisineName) {
-        event.preventDefault();
-
-        if (!cuisineName.trim()) {
-            Swal.fire({
-                title: 'Error',
-                icon: 'error',
-                text: 'Cuisine name cannot be empty!',
-                showConfirmButton: false
-            });
-            return;
-        }
-
-        Swal.fire({
-            title: 'Add Cuisine',
-            icon: 'success',
-            text: 'Cuisine Added successfully!',
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true
-        }).then(() => {
-            document.querySelector("form").submit();
-        });
-    }
-
-    function showUpdatePopup(event, cuisineId, cuisineName) {
-
-        Swal.fire({
-            title: 'Update Cuisine',
-            input: 'text',
-            inputLabel: 'Cuisine Name',
-            inputValue: cuisineName,
-            showCancelButton: true,
-            confirmButtonText: 'Update',
-            cancelButtonText: 'Cancel',
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'Cuisine name cannot be empty!';
-                }
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('update_cuisine_id').value = cuisineId;
-                document.getElementById('update_cuisine_name').value = result.value;
-
-                document.getElementById('update-form').submit();
-                event.preventDefault();
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: 'Cuisine updated successfully!',
-                    showConfirmButton: true
-                });
-            }
-        });
-    }
-
-
-    function showDeleteConfirmation(event, cuisineId) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Delete ',
-            cancelButtonText: 'No',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('delete_cuisine_id').value = cuisineId;
-
-                document.getElementById('delete-form').submit();
-
-                event.preventDefault();
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: 'Cuisine deleted successfully!',
-                    showConfirmButton: true,
-                    timer: 5000,
-                });
-            }
-        });
-    }
-
-    // product delete popup
-    function deleteProduct(event, productId) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Delete ',
-            cancelButtonText: 'No',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                event.preventDefault();
-
-                document.getElementById('delete_product').value = productId;
-
-                document.getElementById('delete-form').submit();
-
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: 'Cuisine deleted successfully!',
-                    showConfirmButton: true,
-                    timer: 5000,
-                });
-            }
-        });
-    }
-
-
-    // Menu update popup
-
-    function openPopup(event, id, name, product_image, price, description, cuisineId) {
-        event.preventDefault();
-
-        Swal.fire({
-            title: 'Update Product',
-            html: `
-                <div style="display: flex;flex-direction:column;align-items:center;margin-bottom:10px; gap: 20px;">
-                <img id="popupImagePreview" src="../${product_image}" alt="${product_image}" style="max-width: 50%; margin-bottom: 10px;" />
-                    <input type="file" id="product_image" name="product_image" accept="image/*" onchange="previewImagePopup(event)" required hidden>
-                    <button type="button" class="button" onclick="changeImagePopup(event)">Change</button>
-                </div>
-                <label for="productName" style="display: block; margin-bottom: 5px;">Product Name:</label>
-                <input type="text" id="productName" value="${name}" class="swal2-input" style="margin-bottom: 15px;" />
-
-                </div>
-            <div>
-                <label for="productPrice" style="display: block; margin-bottom: 5px;">Price:</label>
-                <input type="text" id="productPrice" value="${price}" class="swal2-input" style="margin-bottom: 15px;" />
-            </div>
-            <div>
-                <label for="productCuisine" style="display: block; margin-bottom: 5px;">Cuisine:</label>
-                <select id="productCuisine" class="swal2-input" style="margin-bottom: 15px;">
-                    ${getCuisineOptions(cuisineId)}
-                </select>
-            </div>
-            <div>
-                <label for="productDescription" style="display: block; margin-bottom: 5px;">Description:</label>
-                <textarea id="productDescription" class="swal2-textarea" style="margin-bottom: 15px;">${description}</textarea>
-            </div>
-        `,
-            showCancelButton: true,
-            confirmButtonText: 'Update',
-            preConfirm: () => {
-                const formData = new FormData();
-                formData.append('update_product', true);
-                formData.append('update_item_id', id);
-                formData.append('item_name', document.getElementById('productName').value);
-                formData.append('price', document.getElementById('productPrice').value);
-                formData.append('cuisine_id', document.getElementById('productCuisine').value);
-                formData.append('description', document.getElementById('productDescription').value);
-
-                const productImage = document.getElementById('product_image').files[0];
-                if (productImage) {
-                    formData.append('product_image', productImage);
-                }
-
-                return fetch('menuManagement.php', {
-                        method: 'POST',
-                        body: formData,
-                    })
-                    .then((response) => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.text();
-                    })
-                    .catch((error) => {
-                        Swal.showValidationMessage(`Request failed: ${error}`);
-                    });
-            },
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Product Updated!',
-                    text: 'The product details were updated successfully.',
-                    showConfirmButton: false,
-                    timer: 2000,
-                }).then(() => {
-                    event.preventDefault();
-                    window.location = 'menuManagement.php';
-                });
-            }
-        });
-    }
-
-    function getCuisineOptions(selectedId) {
-        const cuisines = <?= json_encode($cuisines); ?>;
-        return cuisines
-            .map(
-                (cuisine) =>
-                `<option value="${cuisine.id}" ${
-                    cuisine.id == selectedId ? 'selected' : ''
-                }>${cuisine.name}</option>`
-            )
-            .join('');
-    }
-
-    function changeImagePopup(event) {
-        document.getElementById('product_image').click();
-    }
-
-    function previewImagePopup(event) {
-        const imagePreview = document.getElementById('popupImagePreview');
-
-        if (event.target.files && event.target.files[0]) {
-            const reader = new FileReader();
-
-            reader.onload = () => {
-
-                imagePreview.src = reader.result;
-                imagePreview.style.display = 'block';
-            };
-
-            reader.readAsDataURL(event.target.files[0]);
-        }
-    }
-
-    // product delete popup
-
-    function deleteProduct(event, productId) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Delete',
-            cancelButtonText: 'No',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const form = document.createElement('form');
-                form.method = 'post';
-                form.action = 'menuManagement.php';
-
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'remove_product';
-                input.value = productId;
-
-                form.appendChild(input);
-                document.body.appendChild(form);
-                form.submit();
-            }
-        });
     }
 </script>
 
