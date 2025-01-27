@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const navlist = document.querySelector('.navlist');
   
     window.addEventListener("scroll", function () {
-      header.classList.toggle("sticky", window.scrollY > 80);
+      header.classList.toggle("sticky", window.scrollY > 60);
     });
   
     menu.onclick = () => {
@@ -17,14 +17,14 @@ document.addEventListener('DOMContentLoaded', function () {
       navlist.classList.remove('open');
     };
   
-    ScrollReveal().reveal('.background-container', {
-      duration: 1000,
-      delay: 200,
-      origin: 'bottom',
-      distance: '50px',
-      easing: 'ease-in-out',
-      reset: true,
-    });
+    // ScrollReveal().reveal('.background-container', {
+    //   duration: 1000,
+    //   delay: 200,
+    //   origin: 'bottom',
+    //   distance: '50px',
+    //   easing: 'ease-in-out',
+    //   reset: true,
+    // });
   
     ScrollReveal().reveal('.icon-container-box', {
       duration: 1000,
